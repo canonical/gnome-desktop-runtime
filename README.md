@@ -26,4 +26,9 @@ project's deferred-backend-activation patch. This keeps the content-snap
 session from reintroducing the portal startup delay fixed in
 `core-base-desktop`; keep the patch synchronized between the two projects.
 
+The snap also runs the user-scoped PipeWire daemon and WirePlumber session
+manager. It exports the PipeWire socket through the `pipewire` slot, and the
+desktop session connects its portal and screencast services to that slot.
+WirePlumber connects to the desktop session's portal permission store.
+
 Build locally with `./go-build`.
