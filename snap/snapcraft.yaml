@@ -71,7 +71,13 @@ parts:
     plugin: nil
     stage:
       - -usr/libexec/xdg-desktop-portal
-      - -usr/share/gdm/greeter
+      # Keep host-owned GDM integration in core; this snap supplies the
+      # daemon/runtime payload, not a second service or host PAM setup.
+      - -etc/gdm3
+      - -etc/pam.d/gdm-*
+      - -usr/lib/systemd/system/gdm.service
+      - -usr/lib/systemd/system/gdm3.service
+      - -usr/lib/systemd/system/display-manager.service
       - -usr/lib/systemd/user/org.freedesktop.IBus.session.GNOME.service
       - -usr/lib/systemd/user/org.freedesktop.IBus.session.generic.service
       - -usr/lib/systemd/user/gnome-session.target.wants/org.freedesktop.IBus.session.GNOME.service
@@ -111,6 +117,7 @@ parts:
 
       # gdm-packages
       - xwayland
+      - gdm3
       - libgl1-mesa-dri
       - rust-coreutils
       - zenity
@@ -164,6 +171,12 @@ parts:
         "$CRAFT_PRIME/usr/bin/glib-compile-schemas" \
         "$CRAFT_PRIME/usr/share/glib-2.0/schemas"
       test -f "$CRAFT_PRIME/usr/share/glib-2.0/schemas/gschemas.compiled"
+
+      gnome_shell_data="$CRAFT_PRIME/usr/share/gnome-shell"
+      ln -sfn theme/Yaru/gnome-shell-theme.gresource \
+        "$gnome_shell_data/gdm-theme.gresource"
+      ln -sfn theme/Yaru/gnome-shell-icons.gresource \
+        "$gnome_shell_data/gdm-icons.gresource"
 
   xdg-desktop-portal-patched:
     after:
