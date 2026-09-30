@@ -71,6 +71,36 @@ parts:
     plugin: nil
     stage:
       - -usr/libexec/xdg-desktop-portal
+      - -usr/share/gdm/greeter
+      - -usr/lib/systemd/user/org.freedesktop.IBus.session.GNOME.service
+      - -usr/lib/systemd/user/org.freedesktop.IBus.session.generic.service
+      - -usr/lib/systemd/user/gnome-session.target.wants/org.freedesktop.IBus.session.GNOME.service
+      # These services are activated by the session snap's D-Bus apps.
+      - -usr/lib/systemd/user/colord-session.service
+      - -usr/lib/systemd/user/xdg-desktop-portal.service
+      - -usr/lib/systemd/user/xdg-desktop-portal-gnome.service
+      - -usr/lib/systemd/user/xdg-desktop-portal-gtk.service
+      - -usr/lib/systemd/user/xdg-document-portal.service
+      - -usr/lib/systemd/user/xdg-permission-store.service
+      - -usr/lib/systemd/user/tinysparql-xdg-portal-3.service
+      - -usr/share/dbus-1/services/org.freedesktop.ColorHelper.service
+      - -usr/share/dbus-1/services/org.freedesktop.IBus.service
+      - -usr/share/dbus-1/services/org.freedesktop.portal.IBus.service
+      - -usr/share/dbus-1/services/org.freedesktop.impl.portal.desktop.gnome.service
+      - -usr/share/dbus-1/services/org.freedesktop.impl.portal.desktop.gtk.service
+      - -usr/share/dbus-1/services/org.freedesktop.impl.portal.PermissionStore.service
+      - -usr/share/dbus-1/services/org.freedesktop.impl.portal.Secret.service
+      - -usr/share/dbus-1/services/org.freedesktop.portal.Desktop.service
+      - -usr/share/dbus-1/services/org.freedesktop.portal.Documents.service
+      - -usr/share/dbus-1/services/org.freedesktop.portal.Tracker.service
+      - -usr/share/dbus-1/services/org.gnome.Nautilus.service
+      - -usr/share/dbus-1/services/org.gnome.ControlCenter.service
+      - -usr/share/dbus-1/services/org.gnome.ControlCenter.SearchProvider.service
+      - -usr/share/dbus-1/services/org.gnome.Settings.service
+      - -usr/share/dbus-1/services/org.gnome.Settings.GlobalShortcutsProvider.service
+      - -usr/share/dbus-1/services/org.gnome.Settings.SearchProvider.service
+      - -usr/share/dbus-1/services/org.gnome.Shell.Screencast.service
+      - -usr/share/dbus-1/services/org.gnome.Terminal.service
     stage-packages:
       # desktop-packages
       - fonts-ubuntu
@@ -80,7 +110,6 @@ parts:
       - xkb-data
 
       # gdm-packages
-      - gdm3
       - xwayland
       - libgl1-mesa-dri
       - rust-coreutils
@@ -115,10 +144,6 @@ parts:
       - gnome-shell-extension-ubuntu-tiling-assistant
       - gnome-control-center
       - gnome-keyring
-      - fprintd
-      - libpam-fprintd
-      - bolt
-      - libpam-gnome-keyring
       - spice-vdagent
       - xdg-desktop-portal
       - xdg-desktop-portal-gnome
