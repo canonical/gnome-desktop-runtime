@@ -21,7 +21,7 @@ the confined user session.
 The final packed core plus content size is 614,305,792 bytes, which is
 1,945,600 bytes below the historical pre-split core. Exact measurements
 and runtime verification are recorded in
-`~chrb/git/notes/todo/20260930-move-gdm-to-the-gnome-content-snap.txt`.
+`~chrb/git/notes/done/20260930-move-gdm-to-the-gnome-content-snap.txt`.
 
 The Ubuntu wallpaper assets are included in the content mount at
 `/usr/share/backgrounds`, matching the absolute paths used by GNOME's
