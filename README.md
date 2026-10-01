@@ -5,20 +5,29 @@ This snap stages the GNOME desktop package manifest extracted from
 content slot. The GNOME session snap consumes it under its own snap
 namespace rather than inheriting a custom desktop base.
 
-The package list is based on the Stage 2.3 manifest. GDM migration is being
-staged: `gdm3` and its greeter data are supplied here, while the host
-systemd unit, `/etc/gdm3`, and GDM PAM service definitions remain owned by
-core. The host-managed, unconfined GDM and greeter runtime now launch from
-this snap, with core fallbacks retained until cleanup. A fresh image boots
-to the confined GNOME session, and the greeter Shell has been verified
-from this snap with autologin disabled. Password login, logout, and a
-second login were verified before starting cleanup of the duplicate core
-payload. See
+The package list is based on the Stage 2.3 manifest. GDM and its greeter
+runtime are supplied here, while the host systemd unit, `/etc/gdm3`, PAM
+definitions, and required host integrations remain owned by core. The
+cleanup image has booted with GDM and its workers executing from this
+snap, unconfined as intended for this milestone. The GNOME Shell session
+continues to run from `ubuntu-desktop-session` under its enforced
+AppArmor profile, and the cleanup boot has no failed system or user units.
+Core fallbacks for the moved runtime have been removed. Password login,
+logout, and a second login were verified before the cleanup stage.
+On the final cleanup image, logout returns to a stable GDM user chooser
+running GNOME Shell from this snap in `gdm` mode; restarting GDM restores
+the confined user session.
+
+The final packed core plus content size is 614,305,792 bytes, which is
+1,945,600 bytes below the historical pre-split core. Exact measurements
+and runtime verification are recorded in
 `~chrb/git/notes/todo/20260930-move-gdm-to-the-gnome-content-snap.txt`.
 
-The Resolute wallpapers are included in the content mount. The session snap
-binds them at `/usr/share/backgrounds`, matching the absolute paths used by
-GNOME's background settings.
+The Ubuntu wallpaper assets are included in the content mount at
+`/usr/share/backgrounds`, matching the absolute paths used by GNOME's
+background settings. The schema defaults use
+`warty-final-ubuntu.png` for light mode and `ubuntu-wallpaper-d.png` for
+dark mode.
 
 `fonts-ubuntu` is staged in the content snap so confined applications can
 resolve Ubuntu's default `Ubuntu Sans Mono` terminal font.

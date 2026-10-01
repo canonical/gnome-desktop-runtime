@@ -164,8 +164,8 @@ parts:
         "$CRAFT_PRIME/usr/bin/dircolors"
       cat > "$CRAFT_PRIME/usr/share/glib-2.0/schemas/90_ubuntu-core-desktop-background.gschema.override" <<'EOF'
       [org.gnome.desktop.background]
-      picture-uri = 'file:///usr/share/backgrounds/Resolute_Raccoon_Wallpaper_Light_3840x2160.png'
-      picture-uri-dark = 'file:///usr/share/backgrounds/Resolute_Raccoon_Wallpaper_Dimmed_3840x2160.png'
+      picture-uri = 'file:///usr/share/backgrounds/warty-final-ubuntu.png'
+      picture-uri-dark = 'file:///usr/share/backgrounds/ubuntu-wallpaper-d.png'
       EOF
       LD_LIBRARY_PATH="$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$CRAFT_PRIME/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$CRAFT_PRIME/usr/lib:$CRAFT_PRIME/lib" \
         "$CRAFT_PRIME/usr/bin/glib-compile-schemas" \
@@ -177,6 +177,45 @@ parts:
         "$gnome_shell_data/gdm-theme.gresource"
       ln -sfn theme/Yaru/gnome-shell-icons.gresource \
         "$gnome_shell_data/gdm-icons.gresource"
+
+      initial_setup_mode="$gnome_shell_data/modes/initial-setup.json"
+      mkdir -p "$(dirname "$initial_setup_mode")"
+      cat > "$initial_setup_mode" <<'EOF'
+      {
+      "stylesheetName": "Yaru/gnome-shell.css",
+      "colorScheme": "prefer-light",
+      "themeResourceName": "theme/Yaru/gnome-shell-theme.gresource",
+      "iconsResourceName": "theme/Yaru/gnome-shell-icons.gresource",
+          "hasWindows": true,
+          "components": ["networkAgent"],
+          "panel": { "left": [],
+                     "center": [],
+                     "right": ["a11y", "keyboard", "quickSettings"]
+          }
+      }
+      EOF
+
+      pixbuf_dir="$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gdk-pixbuf-2.0"
+      pixbuf_loaders="$pixbuf_dir/2.10.0/loaders"
+      pixbuf_query="$pixbuf_dir/gdk-pixbuf-query-loaders"
+      pixbuf_cache="$pixbuf_dir/2.10.0/loaders.cache"
+      test -x "$pixbuf_query"
+      test -d "$pixbuf_loaders"
+      pixbuf_modules=()
+      for module in "$pixbuf_loaders"/*.so; do
+        [ -f "$module" ] || continue
+        pixbuf_modules+=("$module")
+      done
+      if [ "${#pixbuf_modules[@]}" -eq 0 ]; then
+        echo "No GDK Pixbuf loader modules found in $pixbuf_loaders" >&2
+        exit 1
+      fi
+      LD_LIBRARY_PATH="$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$CRAFT_PRIME/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$CRAFT_PRIME/usr/lib:$CRAFT_PRIME/lib" \
+        "$pixbuf_query" "${pixbuf_modules[@]}" |
+        sed "s|$CRAFT_PRIME|/snap/gnome-desktop-content/current|g" \
+          > "$pixbuf_cache"
+      test -s "$pixbuf_cache"
+      touch -d "2099-01-01" "$pixbuf_cache"
 
   xdg-desktop-portal-patched:
     after:
