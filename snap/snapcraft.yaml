@@ -24,6 +24,10 @@ slots:
     interface: pipewire
 
 layout:
+  /usr/share/gnome-session:
+    bind: $SNAP/usr/share/gnome-session
+  /usr/libexec/gnome-session-init-worker:
+    bind-file: $SNAP/usr/libexec/gnome-session-init-worker
   /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/pipewire-0.3:
     symlink: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/pipewire-0.3
   /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/spa-0.2:
@@ -36,6 +40,13 @@ layout:
     symlink: $SNAP/usr/share/wireplumber
 
 apps:
+  # GDM starts the greeter session through this confined GNOME Session
+  # leader. Its name selects the narrowly generated systemd-user-control
+  # rules for starting the greeter's declared user units.
+  ubuntu-desktop-session:
+    command: usr/bin/gnome-session
+    plugs:
+      - systemd-user-control
   pipewire:
     command: usr/bin/pipewire
     daemon: simple
@@ -55,6 +66,8 @@ apps:
       - pipewire-client
 
 plugs:
+  systemd-user-control:
+    interface: systemd-user-control
   dbus-portal-desktop:
     interface: dbus
     bus: session
