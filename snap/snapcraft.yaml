@@ -71,6 +71,7 @@ apps:
     after: [pipewire]
     slots:
       - audio-playback
+      - audio-record
       - pulseaudio
 
 plugs:
