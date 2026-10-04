@@ -172,6 +172,75 @@ parts:
       - alsa-ucm-conf
     override-prime: |
       craftctl default
+
+      # udisks2/UPower are system-bus daemons, not user-session payload.
+      # They are provided by their own provider snaps (Stage 3B); their
+      # debs only get staged here transitively (gvfs-daemons Depends
+      # udisks2, gnome-control-center Depends upower). The daemon-side
+      # files are inert inside a content mount anyway: the host systemd
+      # and system dbus-daemon cannot see unit or activation files below
+      # /snap/gnome-desktop-content. Keep only the client-side payload
+      # the session processes actually use (libudisks2, libupower-glib
+      # and their typelibs, the gvfs volume monitor and its activation
+      # files).
+      rm -rf "$CRAFT_PRIME/etc/udisks2" "$CRAFT_PRIME/etc/UPower"
+      rm -rf "$CRAFT_PRIME/etc/libblockdev"
+      rm -f "$CRAFT_PRIME/usr/bin/udisksctl" "$CRAFT_PRIME/usr/bin/upower"
+      rm -f "$CRAFT_PRIME/usr/sbin/umount.udisks2"
+      rm -rf "$CRAFT_PRIME/usr/lib/udisks2"
+      rm -rf "$CRAFT_PRIME/usr/libexec/udisks2"
+      rm -f "$CRAFT_PRIME/usr/libexec/upowerd"
+      rm -f "$CRAFT_PRIME/usr/lib/systemd/system/udisks2.service"
+      rm -f "$CRAFT_PRIME/usr/lib/systemd/system/upower.service"
+      rm -f "$CRAFT_PRIME/usr/lib/tmpfiles.d/udisks2.conf"
+      rm -f "$CRAFT_PRIME/usr/lib/udev/rules.d/80-udisks2.rules"
+      rm -f "$CRAFT_PRIME/usr/lib/udev/rules.d/60-upower-battery.rules"
+      rm -f "$CRAFT_PRIME/usr/lib/udev/rules.d/95-upower-hid.rules"
+      rm -f "$CRAFT_PRIME/usr/lib/udev/rules.d/95-upower-wup.rules"
+      rm -f "$CRAFT_PRIME/usr/lib/udev/hwdb.d/60-upower-battery.hwdb"
+      rm -f "$CRAFT_PRIME/usr/lib/udev/hwdb.d/95-upower-hid.hwdb"
+      rm -f "$CRAFT_PRIME/usr/share/dbus-1/system-services/org.freedesktop.UDisks2.service"
+      rm -f "$CRAFT_PRIME/usr/share/dbus-1/system.d/org.freedesktop.UDisks2.conf"
+      rm -f "$CRAFT_PRIME/usr/share/dbus-1/system-services/org.freedesktop.UPower.service"
+      rm -f "$CRAFT_PRIME/usr/share/dbus-1/system.d/org.freedesktop.UPower.conf"
+      rm -f "$CRAFT_PRIME/usr/share/apport/package-hooks/udisks2.py"
+      rm -f "$CRAFT_PRIME/usr/share/apport/package-hooks/libatasmart4.py"
+      rm -f "$CRAFT_PRIME/usr/share/bash-completion/completions/udisksctl"
+      rm -rf "$CRAFT_PRIME/usr/share/doc/libblockdev"* \
+        "$CRAFT_PRIME/usr/share/doc/libatasmart4" \
+        "$CRAFT_PRIME/usr/share/doc/libbytesize1" \
+        "$CRAFT_PRIME/usr/share/doc/libbytesize-common" \
+        "$CRAFT_PRIME/usr/share/doc/libnvme1t64" \
+        "$CRAFT_PRIME/usr/share/doc/libvolume-key1" \
+        "$CRAFT_PRIME/usr/share/doc/udisks2" \
+        "$CRAFT_PRIME/usr/share/doc/upower"
+      rm -f "$CRAFT_PRIME/usr/share/lintian/overrides/libblockdev"* \
+        "$CRAFT_PRIME/usr/share/lintian/overrides/libnvme1t64"
+      rm -f "$CRAFT_PRIME/usr/share/man/man1/udisksctl.1.gz" \
+        "$CRAFT_PRIME/usr/share/man/man1/upower.1.gz" \
+        "$CRAFT_PRIME/usr/share/man/man5/udisks2.conf.5.gz" \
+        "$CRAFT_PRIME/usr/share/man/man7/UPower.7.gz" \
+        "$CRAFT_PRIME/usr/share/man/man8/udisks.8.gz" \
+        "$CRAFT_PRIME/usr/share/man/man8/udisksd.8.gz" \
+        "$CRAFT_PRIME/usr/share/man/man8/umount.udisks2.8.gz" \
+        "$CRAFT_PRIME/usr/share/man/man8/upowerd.8.gz"
+      rm -f "$CRAFT_PRIME/usr/share/zsh/site-functions/_udisks2" \
+        "$CRAFT_PRIME/usr/share/zsh/site-functions/_upower"
+      rm -f "$CRAFT_PRIME/usr/share/polkit-1/actions/org.freedesktop.UDisks2.policy" \
+        "$CRAFT_PRIME/usr/share/polkit-1/actions/org.freedesktop.upower.policy"
+      rm -rf "$CRAFT_PRIME/var/lib/upower"
+      # libblockdev and its plugin modules, plus libatasmart/libbytesize/
+      # libnvme/libvolume_key, are udisksd's daemon-side plugin stack
+      # (pulled in only via the udisks2 deb); no user-session process
+      # links them.
+      rm -rf "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libbd_"*
+      rm -f "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libblockdev.so.3"*
+      rm -f "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libatasmart.so.4"*
+      rm -f "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libbytesize.so.1"*
+      rm -f "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libnvme.so.1"*
+      rm -f "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libnvme-mi.so.1"*
+      rm -f "$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libvolume_key.so.1"*
+
       install -d "$CRAFT_PRIME/usr/bin"
       ln -sfn ../lib/cargo/bin/coreutils/dircolors \
         "$CRAFT_PRIME/usr/bin/dircolors"
@@ -277,11 +346,17 @@ parts:
         --output "xdg-desktop-portal_${version}.debian.tar.xz"
 
       source_dir="${CRAFT_PART_BUILD}/source"
+      # Re-extracting over a previous incremental run's tree would fail
+      # dpkg-source's "unpack target exists" check; start clean each time.
+      rm -rf "${source_dir}"
       dpkg-source --extract "xdg-desktop-portal_${version}.dsc" "${source_dir}"
       patch --strip=1 --directory="${source_dir}" \
         < "${CRAFT_PART_SRC}/patches/xdg-desktop-portal-defer-backend-activation.patch"
 
       build_dir="${CRAFT_PART_BUILD}/build"
+      # Ditto for the meson build tree: a stale configured directory from
+      # a previous incremental run makes `meson setup` fail.
+      rm -rf "${build_dir}"
       meson setup "${build_dir}" "${source_dir}" \
         --prefix=/usr \
         --libexecdir=libexec \
