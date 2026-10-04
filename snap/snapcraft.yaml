@@ -64,6 +64,14 @@ apps:
     plugs:
       - dbus-portal-permission-store
       - pipewire-client
+  pipewire-pulse:
+    command: usr/bin/pipewire-pulse
+    daemon: simple
+    daemon-scope: user
+    after: [pipewire]
+    slots:
+      - audio-playback
+      - pulseaudio
 
 plugs:
   systemd-user-control:
