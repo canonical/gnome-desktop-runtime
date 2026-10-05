@@ -20,8 +20,6 @@ slots:
     content: gnome-desktop-content
     interface: content
     read: ["."]
-  pipewire:
-    interface: pipewire
 
 layout:
   /usr/share/gnome-session:
@@ -47,46 +45,10 @@ apps:
     command: usr/bin/gnome-session
     plugs:
       - systemd-user-control
-  pipewire:
-    command: usr/bin/pipewire
-    daemon: simple
-    daemon-scope: user
-    plugs:
-      - dbus-portal-desktop
-      - hardware-observe
-    slots:
-      - pipewire
-  wireplumber:
-    command: usr/bin/wireplumber
-    daemon: simple
-    daemon-scope: user
-    after: [pipewire]
-    plugs:
-      - dbus-portal-permission-store
-      - pipewire-client
-  pipewire-pulse:
-    command: usr/bin/pipewire-pulse
-    daemon: simple
-    daemon-scope: user
-    after: [pipewire]
-    slots:
-      - audio-playback
-      - audio-record
-      - pulseaudio
 
 plugs:
   systemd-user-control:
     interface: systemd-user-control
-  dbus-portal-desktop:
-    interface: dbus
-    bus: session
-    name: org.freedesktop.portal.Desktop
-  dbus-portal-permission-store:
-    interface: dbus
-    bus: session
-    name: org.freedesktop.impl.portal.PermissionStore
-  pipewire-client:
-    interface: pipewire
 
 parts:
   desktop-content:
