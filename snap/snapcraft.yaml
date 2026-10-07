@@ -1,4 +1,4 @@
-name: gnome-desktop-content
+name: gnome-desktop-runtime
 version: "0.1"
 summary: GNOME desktop content for Ubuntu Core Desktop
 description: |
@@ -16,8 +16,8 @@ platforms:
     build-for: [amd64]
 
 slots:
-  gnome-desktop-content:
-    content: gnome-desktop-content
+  gnome-desktop-runtime:
+    content: gnome-desktop-runtime
     interface: content
     read: ["."]
 
@@ -150,7 +150,7 @@ parts:
       # udisks2, gnome-control-center Depends upower). The daemon-side
       # files are inert inside a content mount anyway: the host systemd
       # and system dbus-daemon cannot see unit or activation files below
-      # /snap/gnome-desktop-content. Keep only the client-side payload
+      # /snap/gnome-desktop-runtime. Keep only the client-side payload
       # the session processes actually use (libudisks2, libupower-glib
       # and their typelibs, the gvfs volume monitor and its activation
       # files).
@@ -265,7 +265,7 @@ parts:
       fi
       LD_LIBRARY_PATH="$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$CRAFT_PRIME/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$CRAFT_PRIME/usr/lib:$CRAFT_PRIME/lib" \
         "$pixbuf_query" "${pixbuf_modules[@]}" |
-        sed "s|$CRAFT_PRIME|/snap/gnome-desktop-content/current|g" \
+        sed "s|$CRAFT_PRIME|/snap/gnome-desktop-runtime/current|g" \
           > "$pixbuf_cache"
       test -s "$pixbuf_cache"
       touch -d "2099-01-01" "$pixbuf_cache"

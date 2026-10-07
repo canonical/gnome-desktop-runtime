@@ -1,7 +1,7 @@
 # GNOME desktop content snap
 
 This snap stages the GNOME desktop package manifest extracted from
-`core-base-desktop` and exports it through the `gnome-desktop-content`
+`core-base-desktop` and exports it through the `gnome-desktop-runtime`
 content slot. The GNOME session snap consumes it under its own snap
 namespace rather than inheriting a custom desktop base.
 
