@@ -225,6 +225,16 @@ parts:
         "$CRAFT_PRIME/usr/share/glib-2.0/schemas"
       test -f "$CRAFT_PRIME/usr/share/glib-2.0/schemas/gschemas.compiled"
 
+      # gio resolves default handlers (e.g. double-clicking the Home icon on
+      # the DING desktop) from /usr/share/applications/mimeinfo.cache, which
+      # Debian normally generates via dpkg triggers that never run during
+      # snap staging. Without it gio finds no default handler for any MIME
+      # type and launches (e.g. "Open" from the desktop) silently do nothing.
+      LD_LIBRARY_PATH="$CRAFT_PRIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$CRAFT_PRIME/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$CRAFT_PRIME/usr/lib:$CRAFT_PRIME/lib" \
+        "$CRAFT_PRIME/usr/bin/update-desktop-database" \
+        "$CRAFT_PRIME/usr/share/applications"
+      test -s "$CRAFT_PRIME/usr/share/applications/mimeinfo.cache"
+
       gnome_shell_data="$CRAFT_PRIME/usr/share/gnome-shell"
       ln -sfn theme/Yaru/gnome-shell-theme.gresource \
         "$gnome_shell_data/gdm-theme.gresource"
